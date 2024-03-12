@@ -4,7 +4,7 @@ import { ADSRStore, useADSRStore } from "../stores/ADSRStore";
 import ADSRControl from "./ADSRControl";
 import ADSRGraph from "./ADSRGraph";
 import { useSynthStore } from "../stores/SynthStore";
-import { useOsc1Store } from "../stores/OscStore";
+import { useOsc1Store, useOsc2Store } from "../stores/OscStore";
 import { useDawStore } from "../stores/DawStore";
 import HorizontalPiano from "./HorizontalPiano";
 import { keyToFreq, noteToFreq } from "./NoteMappings";
@@ -15,6 +15,8 @@ import FrequencyGraph from "./FrequencyGraph";
 import OscControl from "./OscControl";
 import { useReverb1Store } from "../stores/ReverbStore";
 import ReverbControl from "./ReverbControl";
+import { useFilter1Store } from "../stores/FilterStore";
+import FilterControl from "./FilterControl";
 
 
 export default function Synth() {
@@ -23,19 +25,33 @@ export default function Synth() {
     const dawStore = useDawStore();
     const synthStore = useSynthStore();
     const osc1Store = useOsc1Store();
+    const osc2Store = useOsc2Store();
     const oscilloscopeStore = useOscilloscopeStore();
     const reverb1Store = useReverb1Store();
+    const filter1Store = useFilter1Store();
 
     useEffect(() => {
         synthStore.initializeSynthNodes();
+        reverb1Store.initializeReverb();
         
-        if (reverb1Store.isEnabled) {
-            osc1Store.setDestinationNode(reverb1Store.convolverNode);
-            reverb1Store.setDestinationNode(oscilloscopeStore.analyserNode);
-            reverb1Store.initializeReverb();
+        // if (reverb1Store.isEnabled) {
+        //     osc1Store.setDestinationNode(reverb1Store.convolverNode);
+        //     osc2Store.setDestinationNode(oscilloscopeStore.analyserNode);
+        //     reverb1Store.setDestinationNode(oscilloscopeStore.analyserNode);
+        //     reverb1Store.initializeReverb();
+        // } else {
+        if (filter1Store.isEnabled) {
+            osc1Store.setDestinationNode(filter1Store.filterNode);
+            reverb1Store.setDestinationNode(filter1Store.filterNode);
+            filter1Store.setDestinationNode(oscilloscopeStore.analyserNode);
+            filter1Store.initialize();
+            osc2Store.setDestinationNode(oscilloscopeStore.analyserNode);
         } else {
             osc1Store.setDestinationNode(oscilloscopeStore.analyserNode);
+            osc2Store.setDestinationNode(oscilloscopeStore.analyserNode);
         }
+        
+        // }
 
         oscilloscopeStore.initialize();
         
@@ -49,6 +65,7 @@ export default function Synth() {
             if (freq !== undefined && !isNotePlaying) {
                 UseKeypressStore.getState().addKeypress(key);
                 useOsc1Store.getState().playOsc(key);
+                useOsc2Store.getState().playOsc(key);
             }
         };
     
@@ -58,6 +75,7 @@ export default function Synth() {
             const key: string = event.key.toUpperCase();
             UseKeypressStore.getState().removeKeypress(key);
             useOsc1Store.getState().stopOsc(key);
+            useOsc2Store.getState().stopOsc(key);
         };
     
         document.addEventListener('keydown', handleKeyDown);
@@ -68,13 +86,14 @@ export default function Synth() {
             document.removeEventListener('keyup', handleKeyUp);
         };
 
-    }, [reverb1Store.isEnabled]);
+    }, [reverb1Store.isEnabled, filter1Store.isEnabled]);
 
     return (
     <div>
         <div className="flex">
             <OscControl />
             <ReverbControl />
+            <FilterControl />
         </div>
         
         <ADSRControl />
