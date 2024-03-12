@@ -13,9 +13,9 @@ export default function ADSRGraph() {
         const attackStartX = 0;
         const attackStartY = context.canvas.height;
         const attackEndX = (context.canvas.width / 4) * (adsr.attackDuration / 2);
-        const attackEndY = context.canvas.height * (1 - adsr.peakLevel);
+        const attackEndY = context.canvas.height * (1 - adsr.peakLevel * 10);
         const decayEndX = attackEndX + (context.canvas.width / 4) * (adsr.decayDuration / 2);
-        const decayEndY = context.canvas.height * (1 - adsr.sustainLevel);
+        const decayEndY = context.canvas.height * (1 - adsr.sustainLevel * 10);
         const sustainEndX = decayEndX + (context.canvas.width / 4) * (adsr.sustainDuration / 2);
         const sustainEndY = decayEndY; 
         const releaseEndX = sustainEndX + (context.canvas.width / 4) * (adsr.releaseDuration / 2);

@@ -25,9 +25,9 @@ export const useADSRStore = create<ADSRStore>((set) => ({
     isEnabled: false,
     adsr: {
         attackDuration: 0.5,
-        peakLevel: 0.4,
+        peakLevel: 0.04,
         decayDuration: 0.5,
-        sustainLevel: 0.2,
+        sustainLevel: 0.02,
         sustainDuration: 0.5,
         releaseDuration: 0.5,
     },
