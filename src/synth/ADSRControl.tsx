@@ -11,7 +11,7 @@ export default function ADSRControl() {
         adsrStore.setAttackDuration(newValue);
     }
     function handlePeakLevelChange(e: any) {
-        const newValue = Math.round(e.target.value * 100) / 100;
+        const newValue = Math.round(e.target.value * 1000) / 1000;
         adsrStore.setPeakLevel(newValue);
 
         if (adsrStore.adsr.sustainLevel > newValue) {
@@ -23,7 +23,7 @@ export default function ADSRControl() {
         adsrStore.setDecayDuration(newValue);
     }
     function handleSustainLevelChange(e: any) {
-        const newValue = Math.round(e.target.value * 100) / 100;
+        const newValue = Math.round(e.target.value * 1000) / 1000;
         adsrStore.setSustainLevel(newValue); 
     }
     function handleSustainDurationChange(e: any) { 
@@ -52,11 +52,11 @@ export default function ADSRControl() {
             <label className="ml-2">Enable</label>
         </div>
         <div className="flex">
-            <input disabled={!adsrStore.isEnabled} type="range" min={0} max={1} step={0.01} defaultValue={adsrStore.adsr.peakLevel} onChange={handlePeakLevelChange} />
+            <input disabled={!adsrStore.isEnabled} type="range" min={0} max={0.04} step={0.001} defaultValue={adsrStore.adsr.peakLevel} onChange={handlePeakLevelChange} />
             <div>Peak Level: {adsrStore.adsr.peakLevel}</div>
         </div>
         <div className="flex">
-            <input disabled={!adsrStore.isEnabled} type="range" min={0} max={adsrStore.adsr.peakLevel} step={0.01} value={adsrStore.adsr.sustainLevel} onChange={handleSustainLevelChange} />
+            <input disabled={!adsrStore.isEnabled} type="range" min={0} max={adsrStore.adsr.peakLevel} step={0.001} value={adsrStore.adsr.sustainLevel} onChange={handleSustainLevelChange} />
             <div>Sustain Level: {adsrStore.adsr.sustainLevel}</div>
         </div>
         <div className="p-2"></div>

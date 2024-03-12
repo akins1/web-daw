@@ -25,6 +25,12 @@ export default function OscControl() {
     function setEnableOsc2(value: boolean) {
         osc2Store.setIsEnabled(value);
     }
+    function handleVoiceCountChange1(value: number) {
+        osc1Store.setVoiceCount(value)
+    }
+    function handleDetuneChange(value: number) {
+        osc1Store.setOscDetune(value);
+    }
 
     return (
     <div className="rounded-md border flex border-gray-400 w-fit p-2 m-2">
@@ -59,17 +65,17 @@ export default function OscControl() {
             <div className="flex">
                 <input type="range" 
                     min={0} 
-                    max={0.2} 
+                    max={0.1} 
                     disabled={adsrStore.isEnabled} 
                     defaultValue={useOsc1Store.getState().oscGain} 
-                    step={0.01} 
+                    step={0.001} 
                     onChange={(e: ChangeEvent<HTMLInputElement>) => handleOsc1GainChange(e)} 
                 />
                 <div>Gain: {osc1Store.oscGain}</div>
             </div>
             <div>
                 <label>Voices</label>
-                <select defaultValue={1} onChange={(e: ChangeEvent<HTMLSelectElement>) => null}>
+                <select defaultValue={1} onChange={(e: ChangeEvent<HTMLSelectElement>) => handleVoiceCountChange1(parseInt(e.target.value))}>
                     <option value={1}>1</option>
                     <option value={2}>2</option>
                     <option value={3}>3</option>
@@ -79,8 +85,8 @@ export default function OscControl() {
                 </select>
             </div>
             <div>
-                <input type="range" defaultValue={0} />
-                <label>Voice Detune: </label>
+                <input disabled={osc1Store.voiceCount == 1} type="range" defaultValue={0} min={0} max={100} onChange={(e: ChangeEvent<HTMLInputElement>) => handleDetuneChange(parseInt(e.target.value))} />
+                <label>Voice Detune: {osc1Store.oscDetune}</label>
             </div>
         </div>
         <div>
@@ -114,10 +120,10 @@ export default function OscControl() {
             <div className="flex">
                 <input type="range" 
                     min={0} 
-                    max={0.2} 
+                    max={0.1} 
                     disabled={adsrStore.isEnabled} 
                     defaultValue={useOsc2Store.getState().oscGain} 
-                    step={0.01} 
+                    step={0.001} 
                     onChange={(e: ChangeEvent<HTMLInputElement>) => handleOsc2GainChange(e)} 
                 />
                 <div>Gain: {osc2Store.oscGain}</div>
