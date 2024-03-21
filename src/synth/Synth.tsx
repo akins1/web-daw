@@ -18,6 +18,13 @@ import ReverbControl from "./ReverbControl";
 import { useFilter1Store } from "../stores/FilterStore";
 import FilterControl from "./FilterControl";
 
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+} from "react-router-dom";
+
 
 export default function Synth() {
     
@@ -42,10 +49,11 @@ export default function Synth() {
         // } else {
         if (filter1Store.isEnabled) {
             osc1Store.setDestinationNode(filter1Store.filterNode);
+            osc2Store.setDestinationNode(filter1Store.filterNode);
             reverb1Store.setDestinationNode(filter1Store.filterNode);
             filter1Store.setDestinationNode(oscilloscopeStore.analyserNode);
             filter1Store.initialize();
-            osc2Store.setDestinationNode(oscilloscopeStore.analyserNode);
+            // osc2Store.setDestinationNode(oscilloscopeStore.analyserNode);
         } else {
             osc1Store.setDestinationNode(oscilloscopeStore.analyserNode);
             osc2Store.setDestinationNode(oscilloscopeStore.analyserNode);
@@ -86,7 +94,7 @@ export default function Synth() {
             document.removeEventListener('keyup', handleKeyUp);
         };
 
-    }, [reverb1Store.isEnabled, filter1Store.isEnabled]);
+    }, [reverb1Store.isEnabled, filter1Store.isEnabled, reverb1Store.isEnabled]);
 
     return (
     <div>
@@ -95,12 +103,17 @@ export default function Synth() {
             <ReverbControl />
             <FilterControl />
         </div>
-        
-        <ADSRControl />
-        <ADSRGraph />
-        <HorizontalPiano />
-        <FrequencyGraph />
-        <OscilloscopeGraph />
+        <div className="flex">
+            <div>
+                <ADSRControl />
+                <ADSRGraph />
+            </div>
+            <div>
+                <HorizontalPiano />
+                <FrequencyGraph />
+                <OscilloscopeGraph />
+            </div>
+        </div>
     </div>
     )
 }

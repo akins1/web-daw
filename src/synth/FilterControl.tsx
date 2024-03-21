@@ -53,6 +53,7 @@ export default function FilterControl() {
                    min={1}
                    max={2000} 
                    step={1}
+                   disabled={!filter1Store.isEnabled}
                    //defaultValue={filter1Store.filterFreq} 
                    onChange={(e: ChangeEvent<HTMLInputElement>) => 
                     //    filter1Store.setFreq(parseInt(e.target.value))}

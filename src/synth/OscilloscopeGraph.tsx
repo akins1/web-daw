@@ -45,8 +45,10 @@ export default function OscilloscopeGraph() {
 
 
     return (
-    <canvas width={600} height={150} className="border border-blue-600" ref={canvasRef}>
+    <div className="border border-gray-600 rounded-md p-2 m-2 w-fit">
+        <canvas width={600} height={150} className="border" ref={canvasRef}>
 
-    </canvas>
+        </canvas>
+    </div>
     );
 }

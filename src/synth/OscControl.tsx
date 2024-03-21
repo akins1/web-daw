@@ -28,8 +28,14 @@ export default function OscControl() {
     function handleVoiceCountChange1(value: number) {
         osc1Store.setVoiceCount(value)
     }
+    function handleVoiceCountChange2(value: number) {
+        osc2Store.setVoiceCount(value)
+    }
     function handleDetuneChange(value: number) {
         osc1Store.setOscDetune(value);
+    }
+    function handleDetuneChange2(value: number) {
+        osc2Store.setOscDetune(value);
     }
 
     return (
@@ -54,11 +60,11 @@ export default function OscControl() {
                 
                 <label>Octave: </label>
                 <select defaultValue={"0"} onChange={(e: ChangeEvent<HTMLSelectElement>) => osc1Store.setOctaveOffset(parseInt(e.target.value))}>
-                    <option value={"-2"}>-2</option>
-                    <option value={"-1"}>-1</option>
-                    <option value={"0"}>0</option>
-                    <option value={"1"}>+1</option>
                     <option value={"2"}>+2</option>
+                    <option value={"1"}>+1</option>
+                    <option value={"0"}>0</option>
+                    <option value={"-1"}>-1</option>
+                    <option value={"-2"}>-2</option>
                 </select>
                 
             </div>
@@ -128,7 +134,21 @@ export default function OscControl() {
                 />
                 <div>Gain: {osc2Store.oscGain}</div>
             </div>
-            
+            <div>
+                <label>Voices</label>
+                <select defaultValue={1} onChange={(e: ChangeEvent<HTMLSelectElement>) => handleVoiceCountChange2(parseInt(e.target.value))}>
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                    <option value={4}>4</option>
+                    <option value={5}>5</option>
+                    <option value={6}>6</option>
+                </select>
+            </div>
+            <div>
+                <input disabled={osc2Store.voiceCount == 1} type="range" defaultValue={0} min={0} max={100} onChange={(e: ChangeEvent<HTMLInputElement>) => handleDetuneChange2(parseInt(e.target.value))} />
+                <label>Voice Detune: {osc2Store.oscDetune}</label>
+            </div>
         </div>
     </div>
     );

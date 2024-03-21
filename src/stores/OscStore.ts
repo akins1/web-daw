@@ -241,7 +241,6 @@ export const useOsc2Store = create<OscStore>((set, get) => ({
     },
     playOsc: (key: string) => {
         if (! get().isEnabled) return;
-        console.log(get().isEnabled);
         const note = keyToNote(key);
         if (note == undefined) return;
         const newNote = applyOctaveToNote(get().octaveOffset, note);
@@ -256,20 +255,48 @@ export const useOsc2Store = create<OscStore>((set, get) => ({
         gainNode.gain.value = get().oscGain;
         const destinationNode = get().destinationNode;
         const currentTime = audioContext.currentTime;
-        const oscNode = new OscillatorNode(audioContext, {
-            "type": oscType,
-            "frequency": freq,
-            // TODO
-        });
 
-        if (sourceNode !== null) { 
-            sourceNode.connect(oscNode);
+        const oscList = []
+        const oscDetuneRange = get().oscDetune;
+        const voiceCount = get().voiceCount;
+        if (voiceCount == 1) {
+            const oscNode = new OscillatorNode(audioContext, {
+                "type": oscType,
+                "frequency": freq,
+                // TODO
+            });
+            oscList.push(oscNode);
+        } else {
+            for (let i = 0; i < voiceCount; i++) {
+                const oscNode = new OscillatorNode(audioContext, {
+                    "type": oscType,
+                    "frequency": freq,
+                    "detune": i * oscDetuneRange / (voiceCount - 1) - oscDetuneRange / 2
+                });
+                oscList.push(oscNode);
+                console.log("detune", i * oscDetuneRange / (voiceCount - 1) - oscDetuneRange / 2);
+            }
         }
 
-        oscNode.connect(gainNode);
+        
+
+        // const oscNode = new OscillatorNode(audioContext, {
+        //     "type": oscType,
+        //     "frequency": freq,
+        //     // TODO
+        // });
+
+        if (sourceNode !== null) { 
+            //sourceNode.connect(oscNode);
+            oscList.forEach((value) => sourceNode.connect(value));
+        }
+
+        oscList.forEach(value => value.connect(gainNode));
+        gainNode.gain.value = get().oscGain / oscList.length;
         gainNode.connect(destinationNode);
 
-        oscNode.start();
+        // oscNode.start();
+        oscList.forEach((value) => value.start());
 
         if (useADSRStore.getState().isEnabled) {
             gainNode.gain.setValueAtTime(0, currentTime);
@@ -277,21 +304,20 @@ export const useOsc2Store = create<OscStore>((set, get) => ({
             gainNode.gain.linearRampToValueAtTime(adsr.sustainLevel, currentTime + adsr.attackDuration + adsr.decayDuration);
             gainNode.gain.setValueAtTime(adsr.sustainLevel, currentTime + adsr.attackDuration + adsr.decayDuration + adsr.sustainDuration);
             gainNode.gain.linearRampToValueAtTime(0, currentTime + adsr.attackDuration + adsr.decayDuration + adsr.sustainDuration + adsr.releaseDuration);
-            oscNode.stop(currentTime + adsr.attackDuration + adsr.decayDuration + adsr.sustainDuration + adsr.releaseDuration);
+            oscList.forEach((value) => value.stop(currentTime + adsr.attackDuration + adsr.decayDuration + adsr.sustainDuration + adsr.releaseDuration));
         }
 
         const currentOscs = get().playingOscs.get(key);
         if (currentOscs === undefined) {
-            get().playingOscs.set(key, [oscNode]);
+            get().playingOscs.set(key, oscList);
         } else {
-            get().playingOscs.set(key, [...currentOscs, oscNode]);
+            get().playingOscs.set(key, [...currentOscs, ...oscList]);
         }
         
         console.log("Created osc: " + key)
 
         const reverb1Store = useReverb1Store.getState();
         if (reverb1Store.isEnabled) {
-            console.log("Reverb 1");
             const reverbOscNode = new OscillatorNode(audioContext, {
                 "type": oscType,
                 "frequency": freq,
